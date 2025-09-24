@@ -1,42 +1,41 @@
-# main.py
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Charger les données
-red_wine = pd.read_csv("../data/winequality-red.csv", sep=";")
-white_wine = pd.read_csv("../data/winequality-white.csv", sep=";")
+def main():
+    # 1. Chargement  du  dataset
+    df = pd.read_csv("../data/wine/wine.data", header=None)
 
-# Ajouter une colonne pour distinguer les types
-red_wine["type"] = "red"
-white_wine["type"] = "white"
+    #  ajout des colonnes pour mieux les comprendre
+    df.columns = [
+        "Classe", "Alcohol", "Malicacid", "Ash", "Alcalinity_of_ash", "Magnesium",
+        "Total_phenols", "Flavanoids", "Nonflavanoid_phenols", "Proanthocyanins",
+        "Color_intensity", "Hue", "0D280_0D315_of_diluted_wines", "Proline"
+    ]
 
-# Fusionner les deux datasets
-wine_data = pd.concat([red_wine, white_wine], ignore_index=True)
+    print("Aperçu des 20 premiere lignes :")
+    print(df.head(20), "\n")
 
-def plot_hist(df, col, bins=20, with_type=False):
-    plt.figure(figsize=(8,5))
-    if with_type:
-        sns.histplot(data=df, x=col, bins=bins, kde=True, hue="type", alpha=0.5)
-    else:
-        sns.histplot(df[col], bins=bins, kde=True)
-    plt.title(f"Distribution de {col}")
+    #   histogramme de l'alcool
+    plt.figure(figsize=(8, 5))
+    plt.hist(df["Alcohol"], bins=20, color="skyblue", edgecolor="black")
+    plt.title("Histogramme de l'Alcohol")
+    plt.xlabel("Teneur en alcool")
+    plt.ylabel("Fréquence")
     plt.show()
 
-def plot_corr(df):
-    plt.figure(figsize=(10,8))
-    # Supprimer "type" qui est non numérique
-    sns.heatmap(df.drop(columns=["type"]).corr(), annot=True, cmap="coolwarm")
-    plt.title("Matrice de corrélation")
+    # 4. Tracer un boxplot : distribution de l'alcool selon la classe
+    plt.figure(figsize=(8, 5))
+    sns.boxplot(x="Classe", y="Alcohol", data=df, palette="Set2")
+    plt.title("Boxplot de l'Alcohol par Classe de vin")
+    plt.show()
+
+    # 5. Heatmap des corrélations
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df.corr(), annot=False, cmap="coolwarm")
+    plt.title("Heatmap des corrélations")
     plt.show()
 
 
 if __name__ == "__main__":
-    #  distribution de l'alcool
-    plot_hist(wine_data, "alcohol", bins=30, with_type=True)
-
-    # distribution de l’acidité volatile
-    plot_hist(wine_data, "volatile acidity", bins=30, with_type=True)
-
-    # Matrice de corrélation
-    plot_corr(wine_data)
+    main()
